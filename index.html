@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Pacifico&family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos Generales */
+        html {
+            box-sizing: border-box;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #fce4ec;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden; 
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .main-content.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+            position: absolute;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            10% { transform: scale(1.03); }
+            20% { transform: scale(1); }
+            30% { transform: scale(1.1); }
+            45% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
+        .heart-container {
+            width: 90%;
+            max-width: 300px;
+            position: relative;
+            cursor: pointer;
+            animation: heartbeat 1.5s infinite ease-out;
+            transition: transform 0.08s ease, filter 0.1s ease;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .heart-container.clicked {
+            transform: scale(1.15) !important;
+            filter: drop-shadow(0 6px 12px rgba(233, 30, 99, 0.4));
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .heart-fill {
+            clip-path: inset(100% 0 0 0);
+            transition: clip-path 0.1s ease-out;
+        }
+
+        .heart-outline {
+            fill: none;
+            stroke: #ad1457;
+            stroke-width: 1.5;
+        }
+
+        .medals-container {
+            margin-top: 20px;
+            position: relative; 
+            width: 320px; 
+            height: 130px; 
+        }
+
+        .plus-sign {
+            font-size: 3em;
+            color: #ad1457;
+            font-weight: bold;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .medal {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            transition: transform 0.2s ease-out;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .medals-container .medal:first-of-type {
+            left: 0;
+        }
+
+        .medals-container .medal:last-of-type {
+            right: 0;
+        }
+
+        .card {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fff 0%, #fce4ec 100%);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(233, 30, 99, 0.1);
+            padding: 40px 30px;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            width: 100%;
+            max-width: 420px;
+            z-index: 1001;
+            position: relative;
+            border: 2px solid rgba(233, 30, 99, 0.1);
+        }
+
+        .card.visible {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2.5em;
+            color: #ad1457;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.3s ease;
+            z-index: 11;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .close-button:hover {
+            background: rgba(233, 30, 99, 0.1);
+            color: #e91e63;
+            transform: rotate(90deg);
+        }
+
+        /* Nuevos estilos para los textos decorativos */
+        .card-text-top {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2em;
+            color: #ad1457;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            line-height: 1.2;
+        }
+
+        .card-text-bottom {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4em;
+            color: #e91e63;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            line-height: 1.3;
+        }
+
+        .card img {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .song-button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin-top: 15px;
+            border-radius: 50px; 
+            background: linear-gradient(45deg, #ff8a80, #e91e63, #ad1457); 
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Pacifico', cursive;
+            letter-spacing: 0.5px;
+        }
+
+        .song-button:hover {
+            transform: translateY(-4px) scale(1.05); 
+            box-shadow: 0 10px 25px rgba(233, 30, 99, 0.6);
+        }
+
+        #confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            z-index: 999; 
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 15px; 
+            height: 26px; 
+        }
+
+        /* Animaciones sutiles para los textos */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card.visible .card-text-top {
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .card.visible .card-text-bottom {
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+
+        .card.visible img {
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .card.visible .song-button {
+            animation: fadeInUp 0.6s ease-out 0.5s both;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card {
+                padding: 30px 20px;
+                max-width: 95%;
+            }
+            
+            .card-text-top {
+                font-size: 1.8em;
+            }
+            
+            .card-text-bottom {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-content">
+    <div class="heart-container">
+        <svg viewBox="-2 -2 36 33.6">
+            <defs>
+                <linearGradient id="heartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#fff09d;" />
+                    <stop offset="100%" style="stop-color:#e91e63;" />
+                </linearGradient>
+            </defs>
+            <path class="heart-fill" fill="url(#heartGradient)" d="M23.6,0c-3.4,0-6.4,2-7.6,5C14.8,2,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.2,16,21.2,16,21.2s16-12,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+            <path class="heart-outline" d="M23.6,0c-3.4,0-6.4,2-7.6,5C14.8,2,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.2,16,21.2,16,21.2s16-12,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+        </svg>
+    </div>
+    <div class="medals-container">
+        <img src="1.png" alt="Tu foto" class="medal">
+        <span class="plus-sign">+</span>
+        <img src="2.png" alt="Foto de ella" class="medal">
+    </div>
+</div>
+
+<div class="card" id="love-card">
+    <div id="close-button" class="close-button">&times;</div>
+    
+    <div class="card-text-top">
+        Para Sandra ✨✨
+    </div>
+    
+    <img src="carta.png" alt="Carta de amor" style="width: 100%; max-width: 300px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); border: 3px solid rgba(255, 255, 255, 0.8);" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    
+    <div style="width: 100%; max-width: 300px; height: 200px; background: linear-gradient(45deg, #ffecd2, #fcb69f); border-radius: 12px; display: none; align-items: center; justify-content: center; font-size: 4em; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); border: 3px solid rgba(255, 255, 255, 0.8);">
+        💕
+    </div>
+    
+    <div class="card-text-bottom">
+        Ya 2 mesesotes juntitos 💖<br>
+        Te amo mucho asi bien muchote Besitos 😘
+    </div>
+    
+    <a href="https://www.youtube.com/watch?v=dQSkuDWhaAo" class="song-button" target="_blank" rel="noopener noreferrer">
+        ▶️ Te Dedico esta canción!
+    </a>
+</div>
+
+<div id="confetti-container"></div>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script>
+<script src='https://unpkg.co/gsap@3/dist/gsap.min.js'></script>
+<script>
+const mainContent = document.querySelector('.main-content');
+const heartContainer = document.querySelector('.heart-container');
+const heartFill = document.querySelector('.heart-fill');
+const loveCard = document.getElementById('love-card');
+const closeButton = document.getElementById('close-button');
+const medalLeft = document.querySelector('.medals-container .medal:first-of-type');
+const medalRight = document.querySelector('.medals-container .medal:last-of-type');
+const plusSign = document.querySelector('.plus-sign');
+const confettiContainer = document.getElementById('confetti-container');
+
+const CHARGE_TARGET = 50;
+const CLICK_INCREMENT = 5;
+const DECAY_RATE = 12;
+const UPDATE_INTERVAL = 50;
+
+let currentCharge = 0;
+let isComplete = false;
+let decayInterval;
+let confettiInterval;
+
+const confettiColors = ["#2ecc71", "#3498db", "#9b59b4", "#f1c40f", "#e67e22", "#e74c3c", "#f368e0"];
+
+function dropConfetti() {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const startX = Math.random() * window.innerWidth;
+    const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+    piece.style.left = startX + 'px';
+    piece.style.top = '-20px';
+    piece.style.backgroundColor = color;
+    confettiContainer.appendChild(piece);
+    const duration = Math.random() * 3 + 4;
+    const endY = window.innerHeight + 20;
+    const endRotation = (Math.random() - 0.5) * 1000;
+    gsap.to(piece, {
+        y: endY,
+        rotation: endRotation,
+        duration: duration,
+        ease: 'none',
+        onComplete: () => piece.remove()
+    });
+}
+
+function startConfetti() {
+    if (!confettiInterval) {
+        confettiInterval = setInterval(dropConfetti, 100);
+    }
+}
+
+function stopConfetti() {
+    clearInterval(confettiInterval);
+    confettiInterval = null;
+    confettiContainer.innerHTML = '';
+}
+
+function updateMedalPositions() {
+    const progress = currentCharge / CHARGE_TARGET;
+    const maxMovement = 68;
+    const movement = progress * maxMovement;
+    medalLeft.style.transform = `translateX(${movement}px)`;
+    medalRight.style.transform = `translateX(${-movement}px)`;
+    plusSign.style.opacity = 1 - progress;
+}
+
+function updateHeartVisual() {
+    const progressPercent = (currentCharge / CHARGE_TARGET) * 100;
+    const insetTop = Math.max(0, 100 - progressPercent);
+    heartFill.style.clipPath = `inset(${insetTop}% 0 0 0)`;
+    updateMedalPositions();
+}
+
+function completeChallenge() {
+    isComplete = true;
+    clearInterval(decayInterval);
+    heartFill.style.clipPath = `inset(0% 0 0 0)`;
+    mainContent.classList.add('hidden');
+    loveCard.classList.add('visible');
+    startConfetti();
+}
+
+function decayCharge() {
+    if (isComplete) return;
+    const decayAmount = (DECAY_RATE * UPDATE_INTERVAL) / 1000;
+    currentCharge = Math.max(0, currentCharge - decayAmount);
+    updateHeartVisual();
+}
+
+function resetGame() {
+    isComplete = false;
+    currentCharge = 0;
+    stopConfetti();
+    setTimeout(() => {
+        updateHeartVisual();
+    }, 100);
+    loveCard.classList.remove('visible');
+    mainContent.classList.remove('hidden');
+    clearInterval(decayInterval);
+    decayInterval = setInterval(decayCharge, UPDATE_INTERVAL);
+}
+
+function handleInteraction() {
+    if (isComplete) return;
+    currentCharge = Math.min(CHARGE_TARGET, currentCharge + CLICK_INCREMENT);
+    updateHeartVisual();
+
+    heartContainer.classList.add('clicked');
+    setTimeout(() => heartContainer.classList.remove('clicked'), 100);
+
+    if (currentCharge >= CHARGE_TARGET) {
+        completeChallenge();
+    }
+}
+
+heartContainer.addEventListener('click', (event) => {
+    event.stopPropagation();
+    handleInteraction();
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !isComplete) {
+        event.preventDefault();
+        handleInteraction();
+    }
+});
+
+closeButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    resetGame();
+});
+
+resetGame();
+</script>
+
+</body>
+</html>
